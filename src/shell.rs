@@ -95,7 +95,7 @@ fn main() -> Result<()> {
             let arg = git_shell_dequote(arg)
                 .context("command argument is incorrectly quoted")?;
 
-            Err(git.arg(arg).exec())
+            Err(git.arg(cmd).arg(arg).exec())
                 .context("failed to exec git")
         }
         &[_, "cvs server"] => bail!("cvs server is not supported in git-tools, use `-c cmd`"),
