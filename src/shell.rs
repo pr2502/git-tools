@@ -40,14 +40,20 @@ fn git_shell_dequote(input: &str) -> Option<String> {
             // >  a b      ==> a b       ==> 'a b'
             // >  a'b      ==> a'\''b    ==> 'a'\''b'
             // >  a!b      ==> a'\!'b    ==> 'a'\!'b'
-            [b'\'', b'\\', chr @ (b'\'' | b'!'), b'\'', rest @ ..] => {
+            [b'\'', b'\\', chr @ b'\'', b'\'', rest @ ..] |
+            [b'\'', b'\\', chr @ b'!', b'\'', rest @ ..] => {
                 output.push(*chr);
                 input = rest;
             }
+            // [b'\'', b'\\', chr @ (b'\'' | b'!'), b'\'', rest @ ..] => {
+            //     output.push(*chr);
+            //     input = rest;
+            // }
 
             // `'` and `!` have to be escaped,
             // escapes got caught by the previous arm, whatever got here is malformed
-            [b'\'' | b'!', ..] => break None,
+            [b'\'', ..] |
+            [b'!', ..] => break None,
 
             // pass all other characters through
             [chr, rest @ ..] => {
