@@ -26,7 +26,7 @@ fn git_shell_dequote(input: &str) -> Option<String> {
             [] => break String::from_utf8(output).ok(),
 
             // null inside quotes is not permitted because C is bad
-            &[b'\0', ..] => break None,
+            [b'\0', ..] => break None,
 
             // escaped characters, according to the comment on function `sq_quote_buf` in git code
             //
@@ -41,14 +41,10 @@ fn git_shell_dequote(input: &str) -> Option<String> {
             // >  a'b      ==> a'\''b    ==> 'a'\''b'
             // >  a!b      ==> a'\!'b    ==> 'a'\!'b'
             [b'\'', b'\\', chr @ b'\'', b'\'', rest @ ..] |
-            [b'\'', b'\\', chr @ b'!', b'\'', rest @ ..] => {
+            [b'\'', b'\\', chr @ b'!',  b'\'', rest @ ..] => {
                 output.push(*chr);
                 input = rest;
             }
-            // [b'\'', b'\\', chr @ (b'\'' | b'!'), b'\'', rest @ ..] => {
-            //     output.push(*chr);
-            //     input = rest;
-            // }
 
             // `'` and `!` have to be escaped,
             // escapes got caught by the previous arm, whatever got here is malformed
@@ -82,7 +78,7 @@ fn main() -> Result<()> {
     let args = args.iter().map(String::as_str).collect::<Vec<_>>();
 
     match args.as_slice() {
-        &[_, "-c", cmd] => {
+        [_, "-c", cmd] => {
             let cmd = cmd.strip_prefix("git-")
                 .or_else(|| cmd.strip_prefix("git "))
                 .context("command is not a git command")?;
@@ -98,8 +94,8 @@ fn main() -> Result<()> {
             Err(git.arg(cmd).arg(arg).exec())
                 .context("failed to exec git")
         }
-        &[_, "cvs server"] => bail!("cvs server is not supported in git-tools, use `-c cmd`"),
-        &[_] => bail!("interactive git shell is not supported in git-tools, use `-c cmd`"),
+        [_, "cvs server"] => bail!("cvs server is not supported in git-tools, use `-c cmd`"),
+        [_] => bail!("interactive git shell is not supported in git-tools, use `-c cmd`"),
         _ => bail!("invalid arguments, use `-c cmd`"),
     }
 }
