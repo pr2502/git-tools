@@ -12,10 +12,54 @@ use std::path::Path;
 use std::process::Command;
 
 
-fn git_shell_dequote(input: &str) -> Option<String> {
+/// Absolute path to the `git` executable passed at compile time
+const GIT_EXECUTABLE: &str = env!("GIT_EXECUTABLE");
+
+/// List of allowed commands and their handler functions
+const ALLOWED_GIT_COMMANDS: &[(&str, fn(&str) -> Result<()>)] = &[
+    ("receive-pack", standard_commands),
+    ("upload-pack", standard_commands),
+    ("upload-archive", standard_commands),
+];
+
+/// Prepare a git `Command` and check the environment
+fn git() -> Result<Command> {
+    let git = Path::new(GIT_EXECUTABLE);
+    ensure!(git.is_absolute(), "GIT_EXECUTABLE={:?} was not an absolute path, please recompile the binary", &git);
+    ensure!(git.exists(), "GIT_EXECUTABLE={:?} does not exist", &git);
+    Ok(Command::new(git))
+}
+
+/// Execute commands supported by the standard `git-shell`
+fn standard_commands(cmd: &str) -> Result<()> {
+    let (cmd, arg) = cmd.split_once(" ")
+        .context("missing command argument")?;
+
+    let arg = git_shell_dequote(arg)
+        .with_context(|| format!("malformed command argument: {}", arg))?;
+
+    Err(git()?.arg(cmd).arg(arg).exec())
+        .context("failed to exec git")
+}
+
+/// Undo git quoting for the standard commands.
+///
+/// From git source code file `quote.c` function `sq_quote_buf`:
+///
+/// > Any single quote is replaced with '\'', any exclamation point
+/// > is replaced with '\!', and the whole thing is enclosed in a
+/// > single quote pair.
+/// >
+/// > E.g.
+/// >  original     sq_quote     result
+/// >  name     ==> name      ==> 'name'
+/// >  a b      ==> a b       ==> 'a b'
+/// >  a'b      ==> a'\''b    ==> 'a'\''b'
+/// >  a!b      ==> a'\!'b    ==> 'a'\!'b'
+fn git_shell_dequote(input: &str) -> Result<String> {
     let mut input = input
-        .strip_prefix('\'')?
-        .strip_suffix('\'')?
+        .strip_prefix('\'').context("missing ' at the beginning")?
+        .strip_suffix('\'').context("missing ' at the end")?
         .as_bytes();
 
     let mut output = Vec::with_capacity(input.len());
@@ -23,33 +67,21 @@ fn git_shell_dequote(input: &str) -> Option<String> {
     loop {
         match input {
             // done
-            [] => break String::from_utf8(output).ok(),
+            [] => return String::from_utf8(output).context("invalid UTF-8"),
 
-            // null inside quotes is not permitted because C is bad
-            [b'\0', ..] => break None,
+            // null inside strings is not permitted because C is bad
+            [b'\0', ..] => bail!("embedded \\0 in string"),
 
-            // escaped characters, according to the comment on function `sq_quote_buf` in git code
-            //
-            // > Any single quote is replaced with '\'', any exclamation point
-            // > is replaced with '\!', and the whole thing is enclosed in a
-            // > single quote pair.
-            // >
-            // > E.g.
-            // >  original     sq_quote     result
-            // >  name     ==> name      ==> 'name'
-            // >  a b      ==> a b       ==> 'a b'
-            // >  a'b      ==> a'\''b    ==> 'a'\''b'
-            // >  a!b      ==> a'\!'b    ==> 'a'\!'b'
+            // replace escape sequences with just the escaped character
             [b'\'', b'\\', chr @ b'\'', b'\'', rest @ ..] |
             [b'\'', b'\\', chr @ b'!',  b'\'', rest @ ..] => {
                 output.push(*chr);
                 input = rest;
             }
 
-            // `'` and `!` have to be escaped,
-            // escapes got caught by the previous arm, whatever got here is malformed
-            [b'\'', ..] |
-            [b'!', ..] => break None,
+            // `'` and `!` have to be escaped, whatever got here is malformed
+            [chr @ b'\'', ..] |
+            [chr @ b'!', ..] => bail!("unquoted {}", chr),
 
             // pass all other characters through
             [chr, rest @ ..] => {
@@ -60,20 +92,7 @@ fn git_shell_dequote(input: &str) -> Option<String> {
     }
 }
 
-const ALLOWED_GIT_COMMANDS: &[&str] = &[
-    "receive-pack",
-    "upload-pack",
-    "upload-archive",
-];
-
-const GIT_EXECUTABLE: &str = env!("GIT_EXECUTABLE");
-
 fn main() -> Result<()> {
-    let git = Path::new(GIT_EXECUTABLE);
-    ensure!(git.is_absolute(), "GIT_EXECUTABLE={:?} was not an absolute path, please recompile the binary", &git);
-    ensure!(git.exists(), "GIT_EXECUTABLE={:?} does not exist", &git);
-    let mut git = Command::new(git);
-
     let args = env::args().collect::<Vec<_>>();
     let args = args.iter().map(String::as_str).collect::<Vec<_>>();
 
@@ -81,18 +100,13 @@ fn main() -> Result<()> {
         [_, "-c", cmd] => {
             let cmd = cmd.strip_prefix("git-")
                 .or_else(|| cmd.strip_prefix("git "))
-                .context("command is not a git command")?;
+                .with_context(|| format!("`{}` is not a git command", cmd))?;
 
-            let (cmd, arg) = cmd.split_once(" ")
-                .context("missing command argument")?;
+            let fun = ALLOWED_GIT_COMMANDS.iter()
+                .find_map(|(name, fun)| cmd.starts_with(name).then(|| fun))
+                .with_context(|| format!("disallowed or unknown git subcommand `git-{}`", cmd))?;
 
-            ensure!(ALLOWED_GIT_COMMANDS.contains(&cmd), "disallowed or unknown git subcommand `git-{}`", cmd);
-
-            let arg = git_shell_dequote(arg)
-                .context("command argument is incorrectly quoted")?;
-
-            Err(git.arg(cmd).arg(arg).exec())
-                .context("failed to exec git")
+            fun(cmd)
         }
         [_, "cvs server"] => bail!("cvs server is not supported in git-tools, use `-c cmd`"),
         [_] => bail!("interactive git shell is not supported in git-tools, use `-c cmd`"),
