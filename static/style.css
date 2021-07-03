@@ -1,0 +1,106 @@
+/*
+ * ## colors
+ * inspired by the Jellybeans vim colorscheme
+ * <https://github.com/nanotech/jellybeans.vim>
+ *
+ * - basic
+ *   - background   #121212
+ *   - foreground   #d7d7d7
+ *   - highlight    #eeeeee
+ *   - dim          #808080
+ * - accent
+ *   - green        #5faf5f
+ *   - red          #d75f5f
+ *   - blue         #87afd7
+ *   - violet       #8787af
+ *   - yellow       #d7af5f
+ */
+html {
+    background: #121212;
+    color: #d7d7d7;
+    font-family: "Terminus", "Terminus (TTF)", monospace;
+}
+
+body {
+    margin: 50px;
+}
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* navigation menu */
+ul.menu {
+    padding: 0;
+}
+ul.menu li {
+    list-style: none;
+}
+ul.menu li em {
+    font-style: normal;
+    display: inline-block;
+    min-width: 100px;
+}
+ul.menu li em::before {
+    content: "[";
+}
+ul.menu li em::after {
+    content: "]";
+}
+
+/* links */
+a {
+    text-decoration: none;
+    color: #d7d7d7;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* headers */
+h1, h2, h3 {
+    color: #eeeeee;
+    margin: 1.5em 0 0.5em 0;
+}
+h1::before, h2::before, h3::before {
+    color: #5faf5f;
+}
+h1::before {
+    content: "# ";
+}
+h2::before {
+    content: "## ";
+}
+h3::before {
+    content: "### ";
+}
+
+hr {
+    border: 1px 0 0 0;
+    border-top: 1px solid #282828;
+}
+
+/* text clases */
+.comment {
+    color: #808080;
+}
+.comment::before {
+    content: "// ";
+}
+
+/* ls-files */
+table.ls-files {
+    width: 100%;
+}
+table.ls-files td.file-mode-dir a {
+    color: #87afd7;
+}
+table.ls-files td.file-mode-dir a::after {
+    content: '/';
+    color: #d7d7d7;
+}
+table.ls-files td.file-mode-exe a::after {
+    content: '*';
+    color: #d7d7d7;
+}

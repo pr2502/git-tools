@@ -1,0 +1,19 @@
+{% extends "@base" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="/static/gruvbox-dark-hard.css" />
+    <script src="/static/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+{% endblock %}
+{% block main %}
+    <h1><a href="/">git.p2502.net</a> :: {{ repo.name }}</h1>
+
+    <tr>
+        <td class="file-mode-dir" align="left">
+            <a href="{{ up }}">..</a>
+        </td>
+    </tr>
+
+    <h2>{{ blob.name }}</h2>
+    <pre><code{%if blob.binary %} class="language-xxd"{% endif %}>{{ blob.contents }}</code></pre>
+{% endblock %}

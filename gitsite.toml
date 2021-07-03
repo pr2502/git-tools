@@ -1,0 +1,9 @@
+#GITSITE_ROOT="./test"
+#GITSITE_LISTEN="127.0.0.1:8080"
+#RUST_LOG=info,git_site=trace
+
+[debug]
+git_root = "./test"
+
+[release]
+git_root = "./test"

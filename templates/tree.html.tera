@@ -1,0 +1,34 @@
+{% extends "@base" %}
+{% block main %}
+    <h1><a href="/">git.p2502.net</a> :: {{ repo.name }}</h1>
+    <p>{{ repo.description }}</p>
+    <table class="ls-files">
+        <thead>
+            <tr>
+                <th align="left">file</th>
+                <th align="right">last update</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if up %}
+                <tr>
+                    <td class="file-mode-dir" align="left">
+                        <a href="{{ up }}">..</a>
+                    </td>
+                    {# <td>{{ file.last_commit.message }}</td> #}
+                    {# <td>{{ file.last_commit.date }}</td> #}
+                </tr>
+            {% endif %}
+            {% for file in files %}
+                <tr>
+                    <td class="file-mode-{{ file.mode }}" align="left">
+                        <a href="{{ file.href }}">{{ file.name }}</a>
+                    </td>
+                    {# <td>{{ file.last_commit.message }}</td> #}
+                    {# <td>{{ file.last_commit.date }}</td> #}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

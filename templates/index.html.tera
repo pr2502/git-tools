@@ -1,0 +1,9 @@
+{% extends "@base" %}
+{% block main %}
+    <h1>git.p2502.net</h1>
+    <ul class="menu">
+        {% for repo in repos %}
+            <li><em><a href="{{ repo.href }}">{{ repo.name }}</a></em>{{ repo.description }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

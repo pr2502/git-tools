@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{% block title %}git.p2502.net{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <main>
+        {% block main %}{% endblock %}
+    </main>
+</body>
+</html>
