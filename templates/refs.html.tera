@@ -1,0 +1,48 @@
+{% extends "@base" %}
+{% block nav %}
+    {% include "fragments/repo_nav" %}
+{% endblock %}
+{% block main %}
+    <section>
+        <table>
+            <thead>
+                <th>branch</th>
+                <th>last commit</th>
+                <th>age</th>
+            </thead>
+            <tbody>
+                {# {% for repo in repos %} #}
+                {#     <tr> #}
+                {#         <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td> #}
+                {#         <td class="desc">{{ repo.description }}</td> #}
+                {#     </tr> #}
+                {# {% endfor %} #}
+            </tbody>
+            <thead>
+                <th>tag</th>
+                <th>last commit</th>
+                <th>age</th>
+            </thead>
+            <tbody>
+                {# {% for repo in repos %} #}
+                {#     <tr> #}
+                {#         <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td> #}
+                {#         <td class="desc">{{ repo.description }}</td> #}
+                {#     </tr> #}
+                {# {% endfor %} #}
+            </tbody>
+            <thead>
+                <th>time</th>
+                <th>commit message</th>
+            </thead>
+            <tbody>
+                {# {% for repo in repos %} #}
+                {#     <tr> #}
+                {#         <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td> #}
+                {#         <td class="desc">{{ repo.description }}</td> #}
+                {#     </tr> #}
+                {# {% endfor %} #}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}

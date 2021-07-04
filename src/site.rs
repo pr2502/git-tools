@@ -1,12 +1,37 @@
+#![feature(async_closure)]
+#![feature(never_type)]
+
+use rocket::catchers;
 use rocket_dyn_templates::Template;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+
+/// Utility macro for dynamically defining template context
+macro_rules! ctx {
+    ( $( $field:ident $( = $val:expr )? ),* $(,)? ) => {{
+        #[allow(unused_mut)]
+        let mut ctx = ::tera::Context::new();
+        $( ctx!(@ctx $field $( = $val )* ); )*
+        ctx.into_json()
+    }};
+
+    ( @$ctx:ident $field:ident ) => {
+        $ctx.insert(::std::stringify!($field), &$field); 
+    };
+    ( @$ctx:ident $field:ident = $val:expr ) => {
+        $ctx.insert(::std::stringify!($field), &$val); 
+    };
+}
+
+
 mod site {
-    pub mod http_clone;
-    pub mod web;
     pub mod error;
+    pub mod git_repo;
+    pub mod http_clone;
+    pub mod index;
     pub mod repo;
+    pub mod web;
 }
 pub use site::*;
 
@@ -42,6 +67,7 @@ fn launch() -> _ {
     rocket::custom(figment)
         .attach(AdHoc::config::<Config>())
         .attach(Template::fairing())
-        .mount("/", site::http_clone::routes())
-        .mount("/", site::web::routes())
+        .mount("/", http_clone::routes())
+        .mount("/", web::routes())
+        .register("/", catchers![error::default_catcher])
 }

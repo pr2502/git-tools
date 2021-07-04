@@ -1,9 +1,19 @@
 {% extends "@base" %}
 {% block main %}
-    <h1>git.p2502.net</h1>
-    <ul class="menu">
-        {% for repo in repos %}
-            <li><em><a href="{{ repo.href }}">{{ repo.name }}</a></em>{{ repo.description }}</li>
-        {% endfor %}
-    </ul>
+    <section>
+        <table class="index">
+            <thead>
+                <th>repository</th>
+                <th>description</th>
+            </thead>
+            <tbody>
+                {% for repo in repos %}
+                    <tr>
+                        <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td>
+                        <td class="desc">{{ repo.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
 {% endblock %}

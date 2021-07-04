@@ -1,34 +1,37 @@
 {% extends "@base" %}
+{% block title %}{{ super() }} : {{ repo.name }}{% endblock %}
+{% block nav %}
+    {% include "fragments/repo_nav" %}
+{% endblock %}
 {% block main %}
-    <h1><a href="/">git.p2502.net</a> :: {{ repo.name }}</h1>
-    <p>{{ repo.description }}</p>
-    <table class="ls-files">
-        <thead>
-            <tr>
-                <th align="left">file</th>
-                <th align="right">last update</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if up %}
+    <section class="ls-files">
+        <table class="ls-files">
+            <thead>
                 <tr>
-                    <td class="file-mode-dir" align="left">
-                        <a href="{{ up }}">..</a>
-                    </td>
-                    {# <td>{{ file.last_commit.message }}</td> #}
-                    {# <td>{{ file.last_commit.date }}</td> #}
+                    <th align="left">file</th>
+                    <th align="right" colspan="2">{#last update#}</th>
                 </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                    <tr>
+                        <td class="file-mode-{{ file.mode }}" align="left">
+                            <a href="{{ file.href }}">{{ file.name }}</a>
+                        </td>
+                        <td>{#{ file.last_commit.message }#}</td>
+                        <td>{#{ file.last_commit.date }#}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    {% if readme %}
+        <section class="readme">
+            {% if readme.is_html %}
+                {{ readme.content | safe }}
+            {% else %}
+                <pre><code class="language-txt">{{ readme.content }}</code></pre>
             {% endif %}
-            {% for file in files %}
-                <tr>
-                    <td class="file-mode-{{ file.mode }}" align="left">
-                        <a href="{{ file.href }}">{{ file.name }}</a>
-                    </td>
-                    {# <td>{{ file.last_commit.message }}</td> #}
-                    {# <td>{{ file.last_commit.date }}</td> #}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        </section>
+    {% endif %}
 {% endblock %}

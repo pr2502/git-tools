@@ -1,0 +1,238 @@
+/*
+ * ## colors
+ * inspired by the Jellybeans vim colorscheme
+ * <https://github.com/nanotech/jellybeans.vim>
+ */
+
+// basic
+$background:    #121212;
+$foreground:    #d7d7d7;
+$highlight:     #eeeeee;
+$dim:           #808080;
+
+// accent
+$green:         #5faf5f;
+$red:           #d75f5f;
+$blue:          #87afd7;
+$violet:        #8787af;
+$yellow:        #d7af5f;
+
+$bright-green:  #b8bb26;
+$bright-blue:   #5fd7ff;
+
+
+// jellybeans 16 ansi colors
+$jb-black:      #282828;
+$jb-red:        #cc241d;
+$jb-green:      #98971a;
+$jb-yellow:     #d79921;
+$jb-blue:       #458588;
+$jb-magenta:    #b16286;
+$jb-cyan:       #689d6a;
+$jb-grey:       #a89984;
+
+$jb-hl-black:   #928374;
+$jb-hl-red:     #fb4934;
+$jb-hl-green:   #b8bb26;
+$jb-hl-yellow:  #fabd2f;
+$jb-hl-blue:    #83a598;
+$jb-hl-magenta: #d3869b;
+$jb-hl-cyan:    #8ec07c;
+$jb-hl-grey:    #ebdbb2;
+
+$jb-foreground: #d7d7d7;
+$jb-background: #121212;
+
+// some notable vim on jellybeans colors
+$vim-background:        #121212;
+$vim-foreground:        #d7d7d7;
+$vim-cursor-line:       #1c1c1c;
+$vim-linenum:           #5f5f5f;
+$vim-cursor-linenum:    #d7d7d7;
+
+
+html {
+    background: $background;
+    color: $foreground;
+    font-family: "Terminus", "Terminus (TTF)", monospace;
+}
+
+body {
+    margin: 2em 0;
+    padding: 0 0.5em;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+pre code {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+
+    // TODO unify colors
+    color: #d5c4a1;
+    background: #1d2021;
+}
+
+code {
+    padding: 3px 5px;
+}
+
+/* links */
+a {
+    text-decoration: none;
+    color: $blue;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+/* headers */
+h1, h2, h3 {
+    color: $highlight;
+    margin: 1.5em 0 0.5em 0;
+
+    &::before {
+        color: $green;
+        white-space: nowrap;
+    }
+}
+h1::before {
+    content: "# ";
+}
+h2::before {
+    content: "## ";
+}
+h3::before {
+    content: "### ";
+}
+
+/* text clases */
+.comment {
+    color: $dim;
+
+    &::before {
+        content: "// ";
+        white-space: nowrap;
+    }
+}
+
+/* navigation */
+nav {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+
+    /* segmented path navigation */
+    ol.path-nav {
+        display: block;
+        list-style: none;
+        padding-left: 0;
+        margin: 1em 0;
+
+        li {
+            display: inline;
+
+            &:first-child a {
+                color: $green;
+            }
+
+            &::after {
+                content: "/";
+            }
+            &:first-child::after {
+                content: ":";
+            }
+            &:last-child::after {
+                content: "";
+            }
+        }
+    }
+
+    /* branch/tag/commit selection */
+    div.ref-nav {
+        display: block;
+        margin: 1em 0;
+
+        &::before {
+            content: "[";
+        }
+        &::after {
+            content: "]";
+        }
+
+        a {
+            color: $red;
+        }
+    }
+}
+
+section {
+    margin: 1em 0;
+}
+
+table {
+    border-collapse: collapse;
+
+    th {
+        padding: 0.1em 0.5em 0.05em 0.5em;
+        vertical-align: baseline;
+        text-align: left;
+    }
+    td {
+        padding: 0.1em 0.5em;
+    }
+}
+
+/* repo index */
+table.index {
+    width: 100%;
+    padding: 0;
+
+    td.name {
+        white-space: nowrap;
+    }
+
+    tbody tr:hover {
+        background: $vim-cursor-line;
+    }
+}
+
+
+/* ls-files */
+table.ls-files {
+    width: 100%;
+
+    tbody tr:hover {
+        background: $vim-cursor-line;
+    }
+
+    td.file-mode-file {
+        a {
+            color: $foreground;
+        }
+    }
+
+    td.file-mode-dir {
+        a {
+            color: $blue;
+
+            &::after {
+                content: '/';
+                color: $foreground;
+            }
+        }
+    }
+
+    td.file-mode-exe {
+        a {
+            color: $bright-green;
+
+            &::after {
+                content: '*';
+                color: $foreground;
+            }
+        }
+    }
+}

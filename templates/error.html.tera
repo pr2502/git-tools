@@ -1,0 +1,10 @@
+{% extends "@base" %}
+{% block main %}
+    <h1>{{ code }}: {{ reason }}</h1>
+
+    {% if details %}
+        <pre>{{ details }}</pre>
+    {% endif %}
+
+    <a href="/">go back</a>
+{% endblock %}

@@ -4,6 +4,8 @@
 
 [debug]
 git_root = "./test"
+address = "0.0.0.0"
 
 [release]
 git_root = "./test"
+address = "0.0.0.0"
