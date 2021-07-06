@@ -31,6 +31,7 @@ mod site {
     pub mod http_clone;
     pub mod index;
     pub mod repo;
+    pub mod repo_path;
     pub mod web;
 }
 pub use site::*;

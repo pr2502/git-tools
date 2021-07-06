@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::git_repo::{self, GitRepo, Object};
 use crate::index::Index;
 use crate::repo::{File, FileMode, Repo};
+use crate::repo_path::RepoPath;
 use anyhow::Context as _;
 use rocket::fs::NamedFile;
 use rocket::http::uri::Origin;
@@ -39,19 +40,19 @@ pub async fn home(_repo_name: PathBuf, repo: Repo) -> Result<Redirect> {
 }
 
 #[get("/<_repo_name>/tree/<refs>/<path..>", rank = 2)]
-pub async fn tree(_repo_name: PathBuf, refs: String, path: PathBuf, repo: Repo, git_repo: GitRepo) -> Result<Template> {
+pub async fn tree(_repo_name: PathBuf, refs: String, path: RepoPath, repo: Repo, git_repo: GitRepo) -> Result<Template> {
     let object = git_repo.find_subtree_object_by_path(&refs, &path)
         .with_context(|| format!("finding path {:?} in repo {:?}", &path, &repo.path))?
         .context("404")?;
 
     match object {
-        git_repo::Object::Tree(tree) => render_ls_files(tree, refs, path, repo, &git_repo),
-        git_repo::Object::Blob(blob) => render_blob(blob, refs, path, repo),
+        git_repo::Object::Tree(tree) => render_ls_files(tree, refs, &path, repo, &git_repo),
+        git_repo::Object::Blob(blob) => render_blob(blob, refs, &path, repo),
     }
 }
 
 #[get("/<_repo_name>/refs/<refs>/<path..>", rank = 2)]
-pub async fn refs(_repo_name: PathBuf, refs: String, path: PathBuf, repo: Repo) -> Result<Template> {
+pub async fn refs(_repo_name: PathBuf, refs: String, path: RepoPath, repo: Repo) -> Result<Template> {
 
     let path_nav = make_path_nav(&repo, &refs, &path);
     let ref_nav = make_ref_nav(&repo, &refs, &path);
@@ -71,7 +72,7 @@ pub fn routes() -> Vec<Route> {
 }
 
 
-fn render_ls_files(tree: git2::Tree<'_>, refs: String, path: PathBuf, repo: Repo, git_repo: &GitRepo) -> Result<Template> {
+fn render_ls_files(tree: git2::Tree<'_>, refs: String, path: &Path, repo: Repo, git_repo: &GitRepo) -> Result<Template> {
     let up = path.parent()
         .map(|parent| uri!(tree(Path::new(&repo.name), &refs, parent)));
 
@@ -104,7 +105,7 @@ fn render_ls_files(tree: git2::Tree<'_>, refs: String, path: PathBuf, repo: Repo
     Ok(Template::render("tree", ctx!{ repo, up, files, readme, path_nav, ref_nav, view = "tree" }))
 }
 
-fn render_blob(blob: git2::Blob, refs: String, path: PathBuf, repo: Repo) -> Result<Template> {
+fn render_blob(blob: git2::Blob, refs: String, path: &Path, repo: Repo) -> Result<Template> {
     let up = path.parent()
         .map(|parent| uri!(tree(Path::new(&repo.name), &refs, parent)));
 
