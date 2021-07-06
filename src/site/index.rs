@@ -6,7 +6,6 @@ use rocket::http::Status;
 use rocket::outcome::Outcome;
 use rocket::request::FromRequest;
 use rocket::{Request, State};
-use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 
@@ -38,7 +37,8 @@ impl<'req> FromRequest<'req> for Index {
             })
             .try_filter_map(async move |entry| -> Result<_> {
                 let path = entry.path();
-                let name = PathBuf::from(entry.file_name());
+                let name = entry.file_name();
+                let name = name.to_string_lossy();
                 let res = Repo::open(&path, &name).await;
                 match res {
                     Ok(repo) => Ok(repo),

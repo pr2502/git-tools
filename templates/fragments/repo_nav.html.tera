@@ -1,13 +1,13 @@
-<ol class="path-nav">
-    <li>
-        {% if view == "index" %}
-            git.p2502.net
-        {% else %}
-            <a href="/">git.p2502.net</a>
-        {% endif %}
-    </li>
-    {% if path_nav %}
-        {% for segment in path_nav.segments %}
+{% if nav %}
+    <ol class="path-nav">
+        <li>
+            {% if view == "index" %}
+                git.p2502.net
+            {% else %}
+                <a href="/">git.p2502.net</a>
+            {% endif %}
+        </li>
+        {% for segment in nav.path.segments %}
             <li>
                 {% if loop.last and view != "refs" %}
                     {{ segment.name }}
@@ -16,12 +16,12 @@
                 {% endif %}
             </li>
         {% endfor %}
-    {% endif %}
-</ol>
-{% if ref_nav %}
+    </ol>
+{% endif %}
+{% if nav.refs %}
     {% if view == "refs" %}
-        <div class="ref-nav">{{ ref_nav.current }}</div>
+        <div class="ref-nav">{{ nav.refs.current }}</div>
     {% else %}
-        <div class="ref-nav"><a href="{{ ref_nav.href }}">{{ ref_nav.current }}</a></div>
+        <div class="ref-nav"><a href="{{ nav.refs.href }}">{{ nav.refs.current }}</a></div>
     {% endif %}
 {% endif %}

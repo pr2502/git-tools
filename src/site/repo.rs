@@ -87,7 +87,7 @@ mod config {
 }
 
 impl Repo {
-    pub async fn open(repo_path: &Path, repo_name: &Path) -> Result<Option<Repo>> {
+    pub async fn open(repo_path: &Path, repo_name: &str) -> Result<Option<Repo>> {
         let config_path = repo_path.join("site.toml");
         if !config_path.exists() {
             return Ok(None);
@@ -124,9 +124,9 @@ impl Repo {
         });
 
         Ok(Some(Repo {
-            name: repo_name.to_str().unwrap().to_owned(),
+            name: repo_name.to_string(),
             path: repo_path.to_owned(),
-            href: uri!(crate::web::home(repo_name)),
+            href: uri!(crate::web::home(&repo_name)),
             description: config.repo.description,
             default_branch: config.repo.default_branch,
             lang_override,
@@ -142,11 +142,10 @@ impl<'req> FromRequest<'req> for Repo {
     async fn from_request(request: &'req Request<'_>) -> rocket::request::Outcome<Self, Self::Error> {
         let config = request.guard::<&State<crate::Config>>().await.unwrap();
 
-        let res = request.param::<PathBuf>(0)
-            .expect("Repo guard requires <repo_name> first path segment");
-        let repo_name = match res {
-            Ok(repo_name) => repo_name,
-            Err(_) => return Outcome::Forward(()),
+        let repo_name = match request.param::<&str>(0) {
+            Some(Ok(repo_name)) => repo_name,
+            Some(Err(_)) => unreachable!(), // parsing &str never fails
+            None => return Outcome::Forward(()),
         };
 
         let repo_path = config.git_root.join(&repo_name);

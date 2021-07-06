@@ -30,6 +30,7 @@ mod site {
     pub mod git_repo;
     pub mod http_clone;
     pub mod index;
+    pub mod nav;
     pub mod repo;
     pub mod repo_path;
     pub mod web;
