@@ -1,13 +1,13 @@
 {% extends "@base" %}
 {% block title %}{{ super() }} : {{ repo.name }}{% endblock %}
 {% block head %}
-    {{ super() }}
     <link rel="stylesheet" href="/static/gruvbox-dark-hard.css" />
     <script src="/static/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
-{% endblock %}
-{% block nav %}
-    {% include "fragments/repo_nav" %}
+    <script src="/static/highlightjs-line-numbers.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.initLineNumbersOnLoad();
+    </script>
 {% endblock %}
 {% block main %}
     <section class="file">

@@ -1,7 +1,4 @@
 {% extends "@base" %}
-{% block nav %}
-    {% include "fragments/repo_nav" %}
-{% endblock %}
 {% block main %}
     <section>
         <table>

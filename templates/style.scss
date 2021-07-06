@@ -74,8 +74,20 @@ pre code {
     background: #1d2021;
 }
 
+.hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    text-align: right;
+    color: $vim-linenum;
+}
+
 code {
-    padding: 3px 5px;
+    padding: 0.1em 0.25em;
 }
 
 /* links */
@@ -174,6 +186,10 @@ section {
 
 table {
     border-collapse: collapse;
+
+    thead th {
+        padding-top: 1em;
+    }
 
     th {
         padding: 0.1em 0.5em 0.05em 0.5em;

@@ -42,6 +42,7 @@ pub fn default_catcher(status: Status, request: &Request) -> Template {
         code = status.code,
         details,
         reason = status.reason().unwrap_or("Unknown"),
+        view = "error",
     })
 }
 

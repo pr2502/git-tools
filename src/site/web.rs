@@ -11,7 +11,6 @@ use rocket::{get, routes, uri, Route};
 use rocket_dyn_templates::Template;
 use serde::Serialize;
 use std::cmp::Ordering;
-use std::iter;
 use std::path::{Path, PathBuf};
 
 
@@ -248,15 +247,10 @@ fn make_path_nav(repo: &Repo, refs: &str, path: &Path) -> PathNav {
             let href = uri!(tree(Path::new(&repo.name), refs, path));
             Segment { name, href }
         })
-        .chain(iter::once({
-            let name = String::from("git.p2502.net");
-            let href = uri!(index());
-            Segment { name, href }
-        }))
         .collect::<Vec<_>>();
 
-    // `Path::ancestors` yields paths from longest to shortest but doesn't allow reversing,
-    // so we first construct everything in reverse order and then reverse in-place
+    // `Path::ancestors` yields paths from longest to shortest and doesn't allow reversing,
+    // so we reverse the order here
     segments.reverse();
 
     PathNav { segments }

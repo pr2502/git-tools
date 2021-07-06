@@ -12,7 +12,7 @@
         {% block header %}{% endblock %}
     </header>
     <nav>
-        {% block nav %}{% endblock %}
+        {% include "fragments/repo_nav" %}
     </nav>
     <main>
         {% block main %}{% endblock %}
