@@ -4,42 +4,34 @@
         <table>
             <thead>
                 <th>branch</th>
-                <th>last commit</th>
-                <th>age</th>
+                {# <th>last commit</th> #}
+                {# <th>age</th> #}
             </thead>
             <tbody>
-                {# {% for repo in repos %} #}
-                {#     <tr> #}
-                {#         <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td> #}
-                {#         <td class="desc">{{ repo.description }}</td> #}
-                {#     </tr> #}
-                {# {% endfor %} #}
+                {% for branch in branches %}
+                    <tr>
+                        <td><a href="{{ branch.href }}">{{ branch.name }}</a></td>
+                        {# <td>{{ repo.description }}</td> #}
+                    </tr>
+                {% endfor %}
             </tbody>
-            <thead>
-                <th>tag</th>
-                <th>last commit</th>
-                <th>age</th>
-            </thead>
-            <tbody>
-                {# {% for repo in repos %} #}
-                {#     <tr> #}
-                {#         <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td> #}
-                {#         <td class="desc">{{ repo.description }}</td> #}
-                {#     </tr> #}
-                {# {% endfor %} #}
-            </tbody>
-            <thead>
-                <th>time</th>
-                <th>commit message</th>
-            </thead>
-            <tbody>
-                {# {% for repo in repos %} #}
-                {#     <tr> #}
-                {#         <td class="name"><a href="{{ repo.href }}">{{ repo.name }}</a></td> #}
-                {#         <td class="desc">{{ repo.description }}</td> #}
-                {#     </tr> #}
-                {# {% endfor %} #}
-            </tbody>
+            {# <thead> #}
+            {#     <th>tag</th> #}
+            {#     <th>last commit</th> #}
+            {#     <th>age</th> #}
+            {# </thead> #}
+            {# <tbody> #}
+            {#     {% for tag in tags %} #}
+            {#     {% endfor %} #}
+            {# </tbody> #}
+            {# <thead> #}
+            {#     <th>time</th> #}
+            {#     <th>commit message</th> #}
+            {# </thead> #}
+            {# <tbody> #}
+            {#     {% for commit in commits %} #}
+            {#     {% endfor %} #}
+            {# </tbody> #}
         </table>
     </section>
 {% endblock %}

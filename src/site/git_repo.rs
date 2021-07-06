@@ -1,14 +1,20 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::repo::Repo;
 use anyhow::Context;
 use rocket::http::Status;
 use rocket::outcome::{try_outcome, Outcome};
 use rocket::request::{FromRequest, Request};
+use serde::Serialize;
 use std::path::Path;
 
 
 pub struct GitRepo {
     git_repo: git2::Repository,
+}
+
+#[derive(Serialize)]
+pub struct Branch {
+    pub name: String,
 }
 
 pub enum Object<'repo> {
@@ -119,5 +125,25 @@ impl GitRepo {
         };
 
         Ok(None)
+    }
+
+    pub fn branches(&self) -> Result<Vec<Branch>> {
+        self.git_repo
+            .branches(Some(git2::BranchType::Local))
+            .context("iterating branches")?
+            .map(|res| {
+                res.context("reading branch info")
+                    .map_err(Error::from)
+                    .and_then(|(branch, _)| -> Result<Branch> {
+                        let name = branch.name_bytes()
+                            .context("reading branch name")?;
+                        let name = String::from_utf8_lossy(name)
+                            .to_string();
+                        Ok(Branch { name })
+                    })
+            })
+            .collect::<Result<Vec<_>>>()
+            .context("collecting branches")
+            .map_err(Error::from)
     }
 }

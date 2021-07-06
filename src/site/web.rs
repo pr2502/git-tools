@@ -52,12 +52,24 @@ pub async fn tree(_repo_name: PathBuf, refs: String, path: RepoPath, repo: Repo,
 }
 
 #[get("/<_repo_name>/refs/<refs>/<path..>", rank = 2)]
-pub async fn refs(_repo_name: PathBuf, refs: String, path: RepoPath, repo: Repo) -> Result<Template> {
+pub async fn refs(_repo_name: PathBuf, refs: String, path: RepoPath, repo: Repo, git_repo: GitRepo) -> Result<Template> {
+    let branches = git_repo.branches()?
+        .into_iter()
+        .map(|branch| ctx! {
+            href = uri!(tree(Path::new(&repo.name), &branch.name, &path)),
+            name = branch.name,
+        })
+        .collect::<Vec<_>>();
 
     let path_nav = make_path_nav(&repo, &refs, &path);
     let ref_nav = make_ref_nav(&repo, &refs, &path);
 
-    Ok(Template::render("refs", ctx! { path_nav, ref_nav, view = "refs" }))
+    Ok(Template::render("refs", ctx!{
+        path_nav,
+        ref_nav,
+        branches,
+        view = "refs",
+    }))
 }
 
 pub fn routes() -> Vec<Route> {
