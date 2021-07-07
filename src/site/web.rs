@@ -4,11 +4,12 @@ use crate::index::Index;
 use crate::nav::Nav;
 use crate::repo::{File, FileMode, Repo};
 use crate::repo_path::RepoPath;
+use crate::Config;
 use anyhow::Context as _;
 use rocket::fs::NamedFile;
 use rocket::http::Status;
 use rocket::response::Redirect;
-use rocket::{get, routes, uri, Route};
+use rocket::{get, routes, uri, Route, State};
 use rocket_dyn_templates::Template;
 use serde::Serialize;
 use std::cmp::Ordering;
@@ -21,8 +22,17 @@ async fn favicon() -> Status {
 }
 
 #[get("/static/<path..>")]
-async fn statics(path: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("./static").join(path)).await.ok()
+async fn statics(path: PathBuf, config: &State<Config>) -> Option<NamedFile> {
+    let path = config.static_dir.join(path);
+    let res = NamedFile::open(&path).await;
+    match res {
+        Ok(file) => Some(file),
+        Err(_) => {
+            let err = res.context(format!("reading static file {:?}", &path));
+            log::warn!("{:?}", err.unwrap_err());
+            None
+        }
+    }
 }
 
 #[get("/")]

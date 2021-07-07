@@ -41,12 +41,14 @@ pub use site::*;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
     pub git_root: PathBuf,
+    pub static_dir: PathBuf,
 }
 
 impl Default for Config {
     fn default() -> Config {
         Config {
             git_root: PathBuf::from("/home/git"),
+            static_dir: PathBuf::from("./static"),
         }
     }
 }
