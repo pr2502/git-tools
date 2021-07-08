@@ -73,15 +73,14 @@ fn git_shell_dequote(input: &str) -> Result<String> {
             [b'\0', ..] => bail!("embedded \\0 in string"),
 
             // replace escape sequences with just the escaped character
-            [b'\'', b'\\', chr @ b'\'', b'\'', rest @ ..] |
-            [b'\'', b'\\', chr @ b'!',  b'\'', rest @ ..] => {
+            [b'\'', b'\\', chr @ (b'\'' | b'!'), b'\'', rest @ ..] => {
                 output.push(*chr);
                 input = rest;
             }
 
-            // `'` and `!` have to be escaped, whatever got here is malformed
-            [chr @ b'\'', ..] |
-            [chr @ b'!', ..] => bail!("unquoted {}", chr),
+            // `'` and `!` have to be escaped,
+            // escapes got caught by the previous arm, whatever got here is malformed
+            [chr @ (b'\'' | b'!'), ..] => bail!("unquoted {}", chr),
 
             // pass all other characters through
             [chr, rest @ ..] => {
